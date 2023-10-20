@@ -5,7 +5,8 @@ import {
     getCount,
     getUserById,
     getUserByEmail,
-    createUser
+    createUser,
+    updateUser
 } from './business';
 
 async function lists(req: Request, res: Response) {
@@ -32,6 +33,9 @@ async function detail(req: Request, res: Response) {
 
 async function create(req: Request, res: Response) {
     try {
+        /**
+         * Initiaize data
+         */
         let body = {
             id: uuidv4(),
             email: req.body?.email,
@@ -79,11 +83,78 @@ async function create(req: Request, res: Response) {
 }
 
 async function edit(req: Request, res: Response) {
+    try {
+        /**
+         * Initiaize data
+         */
+        let body: any = {
+            id: req.body?.id,
+            email: req.body?.email,
+            fullname: req.body?.fullname,
+            address: req.body?.address,
+            phone: req.body?.phone,
+            is_active: req.body?.is_active,
+            updated_at: new Date(),
+            updated_by: "DATA_INJECTED"
+        }
 
+        /**
+         * Check existing email
+         */
+        let user = await getUserByEmail(body.email, body.id);
+        if (!user) {
+            user = await getUserByEmail(body.email);
+            if (user) return res.status(400).json({ message: "Email is already exists!" });
+        }
+
+        /**
+         * Hash password
+         */
+        if (req.body?.password !== undefined && req.body.password != "") {
+            body["password"] = await Bun.password.hash(req.body.password, {
+                algorithm: "bcrypt",
+            });
+
+        }
+
+        /**
+         * Update data
+         */
+        await updateUser(body);
+
+        /**
+         * Response
+         */
+        return res.status(201).json({
+            message: "Data updated",
+            data: body
+        });
+    } catch (error: any) {
+        return res.status(400).json({ error: error?.message })
+    }
 }
 
 async function remove(req: Request, res: Response) {
+    try {
+        const id = req.params.id;
 
+        /**
+         * Update data
+         */
+        await updateUser({
+            id,
+            deleted: true
+        });
+
+        /**
+         * Response
+         */
+        return res.status(201).json({
+            message: "Data deleted"
+        });
+    } catch (error: any) {
+        return res.status(400).json({ error: error?.message })
+    }
 }
 
 export {

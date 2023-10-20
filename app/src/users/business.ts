@@ -91,13 +91,13 @@ async function getUserById(id: string) {
     return data;
 }
 
-async function getUserByEmail(email: string) {
-    const data = await prisma.users.findFirst({
-        where: {
-            deleted: false,
-            email
-        },
-    });
+async function getUserByEmail(email: string, id: any = null) {
+    let where: any = {
+        deleted: false,
+        email
+    }
+    if (id) where['id'] = id;
+    const data = await prisma.users.findFirst({ where });
     return data;
 }
 
@@ -111,10 +111,24 @@ async function createUser(data: any) {
     }
 }
 
+async function updateUser(data: any) {
+    try {
+        return await prisma.users.update({
+            where: {
+                id: data?.id
+            },
+            data: data
+        });
+    } catch (error) {
+        throw error;
+    }
+}
+
 export {
     getLists,
     getCount,
     getUserById,
     getUserByEmail,
-    createUser
+    createUser,
+    updateUser
 }

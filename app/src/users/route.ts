@@ -18,7 +18,7 @@ class UsersRoute {
         this.router.get("/:id", detail);
         this.router.post("/", create);
         this.router.put("/", edit);
-        this.router.delete("/", remove);
+        this.router.delete("/:id", remove);
     }
 }
 
