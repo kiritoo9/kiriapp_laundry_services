@@ -1,7 +1,10 @@
 import { Router } from "express";
 import {
     lists,
-    detail
+    detail,
+    create,
+    edit,
+    remove
 } from "./resolver";
 
 class UsersRoute {
@@ -13,10 +16,11 @@ class UsersRoute {
     private routes() {
         this.router.get("/", lists);
         this.router.get("/:id", detail);
+        this.router.post("/", create);
+        this.router.put("/", edit);
+        this.router.delete("/", remove);
     }
 }
 
 const users = new UsersRoute().router;
-export {
-    users
-}
+export { users }

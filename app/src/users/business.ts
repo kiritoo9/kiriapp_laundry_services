@@ -81,7 +81,7 @@ async function getCount(
     return totalPage;
 }
 
-async function getDataById(id: string) {
+async function getUserById(id: string) {
     const data = await prisma.users.findFirst({
         where: {
             deleted: false,
@@ -91,8 +91,30 @@ async function getDataById(id: string) {
     return data;
 }
 
+async function getUserByEmail(email: string) {
+    const data = await prisma.users.findFirst({
+        where: {
+            deleted: false,
+            email
+        },
+    });
+    return data;
+}
+
+async function createUser(data: any) {
+    try {
+        return await prisma.users.create({
+            data: data
+        });
+    } catch (error) {
+        throw error;
+    }
+}
+
 export {
     getLists,
     getCount,
-    getDataById
+    getUserById,
+    getUserByEmail,
+    createUser
 }
