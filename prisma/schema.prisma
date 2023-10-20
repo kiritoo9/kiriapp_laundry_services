@@ -1,0 +1,205 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model categories {
+  id          String     @id @db.Uuid
+  name        String?    @db.VarChar(100)
+  description String?
+  deleted     Boolean?   @default(false)
+  created_at  DateTime?  @db.Timestamp(6)
+  created_by  String?    @db.VarChar(100)
+  updated_at  DateTime?  @db.Timestamp(6)
+  updated_by  String?    @db.VarChar(100)
+  products    products[]
+}
+
+model configs {
+  id           String    @id @db.Uuid
+  config_name  String?
+  config_value String?
+  config_key   String?
+  deleted      Boolean?  @default(false)
+  created_at   DateTime? @db.Timestamp(6)
+  created_by   String?   @db.VarChar(100)
+  updated_at   DateTime? @db.Timestamp(6)
+  updated_by   String?   @db.VarChar(100)
+}
+
+model customers {
+  id         String    @id @db.Uuid
+  fullname   String
+  phone      String?   @db.VarChar(20)
+  address    String?
+  email      String?
+  note       String?
+  deleted    Boolean?  @default(false)
+  created_at DateTime? @db.Timestamp(6)
+  created_by String?   @db.VarChar(100)
+  updated_at DateTime? @db.Timestamp(6)
+  updated_by String?   @db.VarChar(100)
+  orders     orders[]
+}
+
+model material_usages {
+  id             String     @id @db.Uuid
+  material_id    String?    @db.Uuid
+  doc_reff_usage String     @db.VarChar(100)
+  total_usage    Float?     @default(0)
+  calculated     Boolean?   @default(false)
+  deleted        Boolean?   @default(false)
+  created_at     DateTime?  @db.Timestamp(6)
+  created_by     String?    @db.VarChar(100)
+  updated_at     DateTime?  @db.Timestamp(6)
+  updated_by     String?    @db.VarChar(100)
+  materials      materials? @relation(fields: [material_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model materials {
+  id                String              @id @db.Uuid
+  uom_id            String?             @db.Uuid
+  name              String?             @db.VarChar(100)
+  description       String?
+  buy_price         Float?              @default(0)
+  max_usage         Float?              @default(0)
+  stock             Float?              @default(0)
+  photo             String?
+  deleted           Boolean?            @default(false)
+  created_at        DateTime?           @db.Timestamp(6)
+  created_by        String?             @db.VarChar(100)
+  updated_at        DateTime?           @db.Timestamp(6)
+  updated_by        String?             @db.VarChar(100)
+  material_usages   material_usages[]
+  product_materials product_materials[]
+}
+
+model order_details {
+  id              String    @id @db.Uuid
+  order_id        String?   @db.Uuid
+  product_id      String?   @db.Uuid
+  weight          Float?    @default(0)
+  qty             Float?    @default(0)
+  price           Float?    @default(0)
+  is_custom_price Boolean?  @default(false)
+  note            String?
+  deleted         Boolean?  @default(false)
+  created_at      DateTime? @db.Timestamp(6)
+  created_by      String?   @db.VarChar(100)
+  updated_at      DateTime? @db.Timestamp(6)
+  updated_by      String?   @db.VarChar(100)
+  orders          orders?   @relation(fields: [order_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  products        products? @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model orders {
+  id            String          @id @db.Uuid
+  order_code    String          @db.VarChar(20)
+  customer_id   String?         @db.Uuid
+  total_qty     Float?          @default(0)
+  total_weight  Float?          @default(0)
+  total_price   Float?          @default(0)
+  status        String?         @default("S1") @db.Char(2)
+  notes         String?
+  deleted       Boolean?        @default(false)
+  created_at    DateTime?       @db.Timestamp(6)
+  created_by    String?         @db.VarChar(100)
+  updated_at    DateTime?       @db.Timestamp(6)
+  updated_by    String?         @db.VarChar(100)
+  order_details order_details[]
+  customers     customers?      @relation(fields: [customer_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model product_materials {
+  id          String     @id @db.Uuid
+  product_id  String?    @db.Uuid
+  material_id String?    @db.Uuid
+  total_usage Float?     @default(0)
+  description String?
+  deleted     Boolean?   @default(false)
+  created_at  DateTime?  @db.Timestamp(6)
+  created_by  String?    @db.VarChar(100)
+  updated_at  DateTime?  @db.Timestamp(6)
+  updated_by  String?    @db.VarChar(100)
+  materials   materials? @relation(fields: [material_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  products    products?  @relation(fields: [product_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model products {
+  id                String              @id @db.Uuid
+  category_id       String?             @db.Uuid
+  name              String              @db.VarChar(100)
+  description       String?
+  price             Float?              @default(0)
+  photo             String?
+  is_active         Boolean?            @default(false)
+  deleted           Boolean?            @default(false)
+  created_at        DateTime?           @db.Timestamp(6)
+  created_by        String?             @db.VarChar(100)
+  updated_at        DateTime?           @db.Timestamp(6)
+  updated_by        String?             @db.VarChar(100)
+  order_details     order_details[]
+  product_materials product_materials[]
+  categories        categories?         @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model roles {
+  id          String       @id @db.Uuid
+  name        String       @db.VarChar(100)
+  description String?
+  deleted     Boolean?     @default(false)
+  created_at  DateTime?    @db.Timestamp(6)
+  created_by  String?      @db.VarChar(100)
+  updated_at  DateTime?    @db.Timestamp(6)
+  updated_by  String?      @db.VarChar(100)
+  user_roles  user_roles[]
+}
+
+model uoms {
+  id          String    @id @db.Uuid
+  name        String?   @db.VarChar(100)
+  description String?
+  formulas    Json?
+  deleted     Boolean?  @default(false)
+  created_at  DateTime? @db.Timestamp(6)
+  created_by  String?   @db.VarChar(100)
+  updated_at  DateTime? @db.Timestamp(6)
+  updated_by  String?   @db.VarChar(100)
+}
+
+model user_roles {
+  id         String    @id @db.Uuid
+  user_id    String?   @db.Uuid
+  role_id    String?   @db.Uuid
+  deleted    Boolean?  @default(false)
+  created_at DateTime? @db.Timestamp(6)
+  created_by String?   @db.VarChar(100)
+  updated_at DateTime? @db.Timestamp(6)
+  updated_by String?   @db.VarChar(100)
+  roles      roles?    @relation(fields: [role_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users      users?    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model users {
+  id         String       @id @db.Uuid
+  usercode   String?      @db.VarChar(100)
+  email      String       @db.VarChar(100)
+  password   String       @db.VarChar(100)
+  fullname   String       @db.VarChar(100)
+  phone      String?      @db.VarChar(20)
+  address    String?
+  photo      String?
+  is_active  Boolean?     @default(false)
+  deleted    Boolean?     @default(false)
+  created_at DateTime?    @db.Timestamp(6)
+  created_by String?      @db.VarChar(100)
+  updated_at DateTime?    @db.Timestamp(6)
+  updated_by String?      @db.VarChar(100)
+  user_roles user_roles[]
+}
