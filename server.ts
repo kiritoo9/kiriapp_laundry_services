@@ -11,6 +11,7 @@ import { verify } from "./app/middlewares/permission";
 import { welcome } from "./app/src/welcome/route";
 import { auth } from "./app/src/auth/route";
 import { users } from "./app/src/users/route";
+import { roles } from "./app/src/roles/route";
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.use("/auth", auth);
  * Init routes with middleware for specific routes
  */
 app.use("/users", verify, users);
+app.use("/roles", verify, roles);
 
 /**
  * Routes error handler

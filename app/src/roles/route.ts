@@ -1,20 +1,18 @@
 import { Router } from "express";
 import {
-    login
+    lists,
 } from "./resolver";
 
-class AuthRoute {
+class RolesRoute {
     public router = Router();
     constructor() {
         this.routes();
     }
 
     private routes() {
-        this.router.post("/login", login);
+        this.router.get("/", lists);
     }
 }
 
-const auth = new AuthRoute().router;
-export {
-    auth
-}
+const roles = new RolesRoute().router;
+export { roles }

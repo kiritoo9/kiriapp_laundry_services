@@ -101,9 +101,34 @@ async function getUserByEmail(email: string, id: any = null) {
     return data;
 }
 
+async function getRoleByUser(user_id: string) {
+    return await prisma.user_roles.findFirst({
+        where: {
+            user_id: user_id
+        },
+        include: {
+            roles: {
+                select: {
+                    name: true
+                }
+            }
+        }
+    })
+}
+
 async function createUser(data: any) {
     try {
         return await prisma.users.create({
+            data: data
+        });
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function createUserRole(data: any) {
+    try {
+        return await prisma.user_roles.create({
             data: data
         });
     } catch (error) {
@@ -124,11 +149,27 @@ async function updateUser(data: any) {
     }
 }
 
+async function updateUserRole(data: any) {
+    try {
+        return await prisma.user_roles.updateMany({
+            where: {
+                user_id: data?.user_id
+            },
+            data: data
+        });
+    } catch (error) {
+        throw error;
+    }
+}
+
 export {
     getLists,
     getCount,
     getUserById,
     getUserByEmail,
     createUser,
-    updateUser
+    updateUser,
+    createUserRole,
+    updateUserRole,
+    getRoleByUser
 }

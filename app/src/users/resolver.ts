@@ -1,15 +1,35 @@
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from 'uuid';
+import Joi from "joi";
 
 import {
     getLists,
     getCount,
     getUserById,
     getUserByEmail,
+    getRoleByUser,
     createUser,
-    updateUser
+    updateUser,
+    createUserRole,
+    updateUserRole
 } from './business';
 
+/**
+ * Define input schema
+ */
+const schema = Joi.object({
+    role_id: Joi.string().required(),
+    email: Joi.string().required(),
+    password: Joi.string().allow(null),
+    fullname: Joi.string().required(),
+    phone: Joi.string().allow(null),
+    address: Joi.string().allow(null),
+    is_active: Joi.boolean().default(false)
+});
+
+/**
+ * Resolvers
+ */
 async function lists(req: Request, res: Response) {
     try {
         const data = await getLists(req);
@@ -17,18 +37,20 @@ async function lists(req: Request, res: Response) {
 
         return res.status(200).json({ data, totalPage });
     } catch (error: any) {
-        return res.status(400).json({ error: error?.message })
+        return res.status(400).json({ error })
     }
 }
 
 async function detail(req: Request, res: Response) {
     try {
-        const data = await getUserById(req.params?.id);
-
+        let data = await getUserById(req.params?.id);
         if (!data) return res.status(404).json({ message: "Data is not found" });
+
+        data["roles"] = await getRoleByUser(data?.id);
+
         return res.status(200).json(data);
     } catch (error: any) {
-        return res.status(400).json({ error: error?.message })
+        return res.status(400).json({ error })
     }
 }
 
@@ -37,6 +59,7 @@ async function create(req: Request, res: Response) {
         /**
          * Initiaize data
          */
+        await schema.validateAsync(req.body);
         let body = {
             id: uuidv4(),
             email: req.body?.email,
@@ -64,12 +87,19 @@ async function create(req: Request, res: Response) {
             algorithm: "bcrypt",
         });
         body.password = hashed;
-        body.usercode = hashed.substring(3, 10);
+        body.usercode = hashed.substring(3, 23);
 
         /**
          * Insert data
          */
         await createUser(body);
+        await createUserRole({
+            id: uuidv4(),
+            user_id: body.id,
+            role_id: req.body.role_id,
+            created_at: body.created_at,
+            created_by: body.created_by
+        });
 
         /**
          * Response
@@ -79,7 +109,7 @@ async function create(req: Request, res: Response) {
             data: body
         });
     } catch (error: any) {
-        return res.status(400).json({ error: error?.message })
+        return res.status(400).json({ error })
     }
 }
 
@@ -88,8 +118,9 @@ async function edit(req: Request, res: Response) {
         /**
          * Initiaize data
          */
+        await schema.validateAsync(req.body);
         let body: any = {
-            id: req.body?.id,
+            id: req.params?.id,
             email: req.body?.email,
             fullname: req.body?.fullname,
             address: req.body?.address,
@@ -98,6 +129,12 @@ async function edit(req: Request, res: Response) {
             updated_at: new Date(),
             updated_by: "DATA_INJECTED"
         }
+
+        /**
+         * Check existing user
+         */
+        const exists = await getUserById(body.id);
+        if (!exists) return res.status(404).json({ message: "Data is not found" });
 
         /**
          * Check existing email
@@ -122,6 +159,12 @@ async function edit(req: Request, res: Response) {
          * Update data
          */
         await updateUser(body);
+        await updateUserRole({
+            user_id: body.id,
+            role_id: req.body.role_id,
+            updated_at: body.updated_at,
+            updated_by: body.updated_by
+        });
 
         /**
          * Response
@@ -131,7 +174,7 @@ async function edit(req: Request, res: Response) {
             data: body
         });
     } catch (error: any) {
-        return res.status(400).json({ error: error?.message })
+        return res.status(400).json({ error })
     }
 }
 
@@ -154,7 +197,7 @@ async function remove(req: Request, res: Response) {
             message: "Data deleted"
         });
     } catch (error: any) {
-        return res.status(400).json({ error: error?.message })
+        return res.status(400).json({ error })
     }
 }
 
