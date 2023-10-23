@@ -14,6 +14,7 @@ import {
 } from './../uoms/business';
 
 import Joi from "joi";
+import { doUpload } from "../../helpers/upload";
 const schema = Joi.object({
     uom_id: Joi.string().required(),
     name: Joi.string().required(),
@@ -50,7 +51,7 @@ async function create(req: Request, res: Response) {
     try {
 
         await schema.validateAsync(req.body);
-        let data = req.body;
+        let data: any = req.body;
         const token = await getToken(req);
         data = {
             ...data,
@@ -64,6 +65,14 @@ async function create(req: Request, res: Response) {
          */
         const uom = await getUomById(data.uom_id);
         if (!uom) return res.status(404).json({ message: "UOM is not found or has been deleted, try another one" });
+
+        /**
+         * Upload photo if there is any
+         */
+        if (data.photo) {
+            const uploaded = await doUpload(data.photo, "materials");
+            if (uploaded?.status) data["photo"] = uploaded?.filename;
+        }
 
         /**
          * Create material
@@ -96,6 +105,16 @@ async function edit(req: Request, res: Response) {
          */
         const uom = await getUomById(body.uom_id);
         if (!uom) return res.status(404).json({ message: "UOM is not found or has been deleted, try another one" });
+
+        /**
+         * Upload photo if there is any
+         */
+        if (data.photo) {
+            const uploaded = await doUpload(data.photo, "materials");
+            if (uploaded?.status) data["photo"] = uploaded?.filename;
+        } else {
+            delete body.photo; // Prevent to not update field "photo" if user set as null (not upload any file)
+        }
 
         /**
          * Update material
