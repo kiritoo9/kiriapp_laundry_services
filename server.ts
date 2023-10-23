@@ -17,6 +17,7 @@ import { customers } from "./app/src/customers/route";
 import { categories } from "./app/src/categories/route";
 import { uoms } from "./app/src/uoms/route";
 import { materials } from "./app/src/materials/route";
+import { products } from "./app/src/products/route";
 
 const app = express();
 
@@ -44,6 +45,7 @@ app.use("/customers", verify, customers);
 app.use("/categories", verify, categories);
 app.use("/uoms", verify, uoms);
 app.use("/materials", verify, materials);
+app.use("/products", verify, products);
 
 /**
  * Routes error handler

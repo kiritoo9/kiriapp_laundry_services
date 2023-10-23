@@ -4,42 +4,42 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-    const kiloanId = uuidv4();
+    const bajuId = uuidv4();
     await prisma.categories.upsert({
-        where: { id: kiloanId },
+        where: { id: bajuId },
         update: {},
         create: {
-            id: kiloanId,
-            name: "Kiloan",
-            description: "Laundry Kiloan",
+            id: bajuId,
+            name: "Baju",
+            description: "Baju Saja",
             deleted: false,
             created_at: new Date(),
             created_by: "SEEDER"
         }
     });
 
-    const konvensionalId = uuidv4();
+    const selimutId = uuidv4();
     await prisma.categories.upsert({
-        where: { id: konvensionalId },
+        where: { id: selimutId },
         update: {},
         create: {
-            id: konvensionalId,
-            name: "Konvensional",
-            description: "Laundry Konvensional",
+            id: selimutId,
+            name: "Selimut",
+            description: "Selimut atau bedcover",
             deleted: false,
             created_at: new Date(),
             created_by: "SEEDER"
         }
     });
 
-    const expressId = uuidv4();
+    const generalId = uuidv4();
     await prisma.categories.upsert({
-        where: { id: expressId },
+        where: { id: generalId },
         update: {},
         create: {
-            id: expressId,
-            name: "Express",
-            description: "Laundry Express",
+            id: generalId,
+            name: "Umum",
+            description: "Kategori umum",
             deleted: false,
             created_at: new Date(),
             created_by: "SEEDER"
