@@ -12,7 +12,7 @@ async function lists(req: Request, res: Response) {
 
         return res.status(200).json({ data, totalPage });
     } catch (error: any) {
-        return res.status(400).json({ error: error?.message })
+        return res.status(400).json({ error })
     }
 }
 

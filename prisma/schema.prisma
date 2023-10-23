@@ -43,6 +43,7 @@ model customers {
   created_by String?   @db.VarChar(100)
   updated_at DateTime? @db.Timestamp(6)
   updated_by String?   @db.VarChar(100)
+  gender     String?   @default("M") @db.Char(1)
   orders     orders[]
 }
 
@@ -75,6 +76,7 @@ model materials {
   updated_at        DateTime?           @db.Timestamp(6)
   updated_by        String?             @db.VarChar(100)
   material_usages   material_usages[]
+  uoms              uoms?               @relation(fields: [uom_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_material_uoms")
   product_materials product_materials[]
 }
 
@@ -161,15 +163,16 @@ model roles {
 }
 
 model uoms {
-  id          String    @id @db.Uuid
-  name        String?   @db.VarChar(100)
+  id          String      @id @db.Uuid
+  name        String?     @db.VarChar(100)
   description String?
   formulas    Json?
-  deleted     Boolean?  @default(false)
-  created_at  DateTime? @db.Timestamp(6)
-  created_by  String?   @db.VarChar(100)
-  updated_at  DateTime? @db.Timestamp(6)
-  updated_by  String?   @db.VarChar(100)
+  deleted     Boolean?    @default(false)
+  created_at  DateTime?   @db.Timestamp(6)
+  created_by  String?     @db.VarChar(100)
+  updated_at  DateTime?   @db.Timestamp(6)
+  updated_by  String?     @db.VarChar(100)
+  materials   materials[]
 }
 
 model user_roles {

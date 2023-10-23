@@ -12,6 +12,11 @@ import { welcome } from "./app/src/welcome/route";
 import { auth } from "./app/src/auth/route";
 import { users } from "./app/src/users/route";
 import { roles } from "./app/src/roles/route";
+import { configs as configRoutes } from "./app/src/configs/route";
+import { customers } from "./app/src/customers/route";
+import { categories } from "./app/src/categories/route";
+import { uoms } from "./app/src/uoms/route";
+import { materials } from "./app/src/materials/route";
 
 const app = express();
 
@@ -34,6 +39,11 @@ app.use("/auth", auth);
  */
 app.use("/users", verify, users);
 app.use("/roles", verify, roles);
+app.use("/configs", verify, configRoutes);
+app.use("/customers", verify, customers);
+app.use("/categories", verify, categories);
+app.use("/uoms", verify, uoms);
+app.use("/materials", verify, materials);
 
 /**
  * Routes error handler

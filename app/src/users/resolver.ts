@@ -13,6 +13,7 @@ import {
     createUserRole,
     updateUserRole
 } from './business';
+import { getToken } from "../../helpers/token";
 
 /**
  * Define input schema
@@ -60,6 +61,7 @@ async function create(req: Request, res: Response) {
          * Initiaize data
          */
         await schema.validateAsync(req.body);
+        const token = await getToken(req);
         let body = {
             id: uuidv4(),
             email: req.body?.email,
@@ -70,7 +72,7 @@ async function create(req: Request, res: Response) {
             phone: req.body?.phone,
             is_active: req.body?.is_active,
             created_at: new Date(),
-            created_by: "DATA_INJECTED"
+            created_by: token?.usercode
         }
 
         /**
@@ -119,6 +121,7 @@ async function edit(req: Request, res: Response) {
          * Initiaize data
          */
         await schema.validateAsync(req.body);
+        const token = await getToken(req);
         let body: any = {
             id: req.params?.id,
             email: req.body?.email,
@@ -127,7 +130,7 @@ async function edit(req: Request, res: Response) {
             phone: req.body?.phone,
             is_active: req.body?.is_active,
             updated_at: new Date(),
-            updated_by: "DATA_INJECTED"
+            updated_by: token?.usercode
         }
 
         /**

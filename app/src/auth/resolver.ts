@@ -27,7 +27,9 @@ async function login(req: Request, res: Response) {
          */
         const SECRET_KEY = new TextEncoder().encode(configs.SECRET_KEY);
         const token = await new jose.SignJWT({
-            user_id: user.id
+            user_id: user.id,
+            usercode: user.usercode,
+            fullname: user.fullname
         })
             .setProtectedHeader({ alg: "HS256" })
             .setIssuedAt()
