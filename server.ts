@@ -18,6 +18,7 @@ import { categories } from "./app/src/categories/route";
 import { uoms } from "./app/src/uoms/route";
 import { materials } from "./app/src/materials/route";
 import { products } from "./app/src/products/route";
+import { orders } from "./app/src/orders/route";
 
 const app = express();
 
@@ -46,6 +47,7 @@ app.use("/categories", verify, categories);
 app.use("/uoms", verify, uoms);
 app.use("/materials", verify, materials);
 app.use("/products", verify, products);
+app.use("/orders", verify, orders);
 
 /**
  * Routes error handler

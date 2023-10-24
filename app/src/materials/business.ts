@@ -120,10 +120,63 @@ async function updateMaterial(data: any) {
     }
 }
 
+async function createMaterialUsage(data: any) {
+    try {
+        return await prisma.material_usages.create({
+            data: data
+        });
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function getMaterialUsageByMaterial(material_id: string, calculated: boolean = false) {
+    try {
+        let where: any = {
+            material_id: material_id
+        }
+        if (calculated) where["calculated"] = calculated;
+        return await prisma.material_usages.findMany({
+            where: where
+        });
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function updateMaterialUsageByMaterial(data: any) {
+    try {
+        return await prisma.material_usages.updateMany({
+            where: {
+                material_id: data.id
+            },
+            data: data
+        })
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function removeMaterialUsagesByDocReff(doc_reff_usage: string) {
+    try {
+        return await prisma.material_usages.deleteMany({
+            where: {
+                doc_reff_usage: doc_reff_usage
+            }
+        });
+    } catch (error) {
+        throw error;
+    }
+}
+
 export {
     getLists,
     getCount,
     getMaterialById,
     createMaterial,
-    updateMaterial
+    updateMaterial,
+    createMaterialUsage,
+    getMaterialUsageByMaterial,
+    updateMaterialUsageByMaterial,
+    removeMaterialUsagesByDocReff
 }

@@ -145,6 +145,7 @@ async function getMaterialsByProduct(product_id: string) {
                         buy_price: true,
                         stock: true,
                         photo: true,
+                        max_usage: true
                     }
                 }
             }
